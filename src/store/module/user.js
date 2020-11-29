@@ -7,7 +7,14 @@ import {
   hasRead,
   removeReaded,
   restoreTrash,
-  getUnreadCount
+  getUnreadCount,
+  getUserlistinfo,
+  deteUserInfo,
+  addUserInfo,
+  getFilelistinfo,
+  deteFileInfo,
+  addFileInfo,
+  uploadFileInfo
 } from '@/api/user'
 import { setToken, getToken } from '@/libs/util'
 
@@ -23,7 +30,10 @@ export default {
     messageUnreadList: [],
     messageReadedList: [],
     messageTrashList: [],
-    messageContentStore: {}
+    messageContentStore: {},
+    roleMsg: {},
+    userinfo: {},
+    fileList: {}
   },
   mutations: {
     setAvatar (state, avatarPath) {
@@ -65,6 +75,15 @@ export default {
       const msgItem = state[from].splice(index, 1)[0]
       msgItem.loading = false
       state[to].unshift(msgItem)
+    },
+    setRoleMsg (state, role) {
+      state.roleMsg = Object.assign({}, role)
+    },
+    setUserList (state, user) {
+      state.userinfo = user
+    },
+    setFileInfo (state, file) {
+      state.fileList = file
     }
   },
   getters: {
@@ -83,7 +102,7 @@ export default {
         }).then(res => {
           const data = res.data
           commit('setToken', data.token)
-          resolve()
+          resolve(data)
         }).catch(err => {
           reject(err)
         })
@@ -210,6 +229,101 @@ export default {
           resolve()
         }).catch(error => {
           reject(error)
+        })
+      })
+    },
+    // 获取用户list
+    getUserlist ({ commit }, { pageNo, pageSize }) {
+      return new Promise((resolve, reject) => {
+        getUserlistinfo({
+          pageNo,
+          pageSize
+        }).then(res => {
+          const data = res.data
+          if (data.code === '0' && data['data'] && data.data['list']) {
+            console.log('setUserList', data.data)
+            commit('setUserList', data.data)
+          }
+          resolve(data)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    // 删除用户
+    deleteUser ({ commit }, { id }) {
+      return new Promise((resolve, reject) => {
+        deteUserInfo({
+          id
+        }).then(res => {
+          console.log('delete', res)
+          resolve(res.data)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    // 新增用户
+    addUserAction ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        addUserInfo(data).then(res => {
+          console.log('addUserAction', res.data)
+          resolve(res.data)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    // 获取资料list
+    getFilelist ({ commit }, { pageNo, pageSize }) {
+      return new Promise((resolve, reject) => {
+        getFilelistinfo({
+          pageNo,
+          pageSize
+        }).then(res => {
+          const data = res.data
+          if (data.code === '0' && data['data'] && data.data['list']) {
+            console.log('setFileList', data.data)
+            commit('setFileInfo', data.data)
+          }
+          resolve(data)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    // 删除资料
+    deleteFile ({ commit }, { id }) {
+      return new Promise((resolve, reject) => {
+        deteFileInfo({
+          id
+        }).then(res => {
+          console.log('deletefile', res)
+          resolve(res.data)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    // 新增资料
+    addFileAction ({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        addFileInfo(data).then(res => {
+          console.log('addfileAction', res)
+          resolve(res.data)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    },
+    // 下载资料
+    uploadFile ({ commit }, filename) {
+      return new Promise((resolve, reject) => {
+        uploadFileInfo(filename).then(res => {
+          console.log('uploadFileInfo', res.data)
+          resolve(res.data)
+        }).catch(err => {
+          reject(err)
         })
       })
     }

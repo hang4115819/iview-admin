@@ -1,20 +1,16 @@
-/* eslint-disable vue/valid-v-bind */
-<!--
-*用户列表
--->
 <template>
-<div class="list-contain">
+   <div class="file-contaner">
     <Table border :columns="columns12" :data="data6">
         <template slot-scope="{ row }" slot="name">
-            <strong>{{ row.username }}</strong>
+            <strong>{{ row.dataName }}</strong>
         </template>
         <template slot-scope="{ row, index }" slot="action">
-            <!-- <Button type="primary" size="small" style="margin-right: 5px" @click="show(index)">View</Button> -->
+            <Button type="primary" size="small" style="margin-right: 5px" @click="upload(row.uploadName)">下载</Button>
             <Button type="error" size="small" @click="remove(row.id)">删除</Button>
         </template>
     </Table>
-    <Page :total="total" @on-change="pageChange" :current="currentPage"/>
-</div>
+     <Page :total="total" @on-change="pageChange" :current="currentPage"/>
+     </div>
 </template>
 <script>
 import { mapActions, mapState } from 'vuex'
@@ -23,24 +19,20 @@ export default {
     return {
       columns12: [
         {
-          title: '用户名',
+          title: '资料名称',
           slot: 'name'
         },
         {
-          title: '角色',
-          key: 'roleCode'
+          title: '资料类型',
+          key: 'typeName'
         },
         {
-          title: '性别',
-          key: 'gender'
+          title: '文件名',
+          key: 'uploadName'
         },
         {
-          title: '年龄',
-          key: 'age'
-        },
-        {
-          title: '备注',
-          key: 'userDesc'
+          title: '描述',
+          key: 'dataDesc'
         },
         {
           title: '操作',
@@ -53,36 +45,30 @@ export default {
     }
   },
   created () {
-    this.getUserlist({
+    this.getFilelist({
       pageNo: this.currentPage,
       pageSize: 10
     })
   },
   computed: {
     ...mapState({
-      userinfo: state => state.user.userinfo
+      fileList: state => state.user.fileList
     }),
     data6 () {
-      return this.userinfo['list'] || []
+      return this.fileList['list'] || []
     },
     total () {
-      return this.userinfo['total'] || 0
+      return this.fileList['total'] || 0
     }
   },
   methods: {
-    ...mapActions(['getUserlist', 'deleteUser']),
-    show (index) {
-      this.$Modal.info({
-        title: 'User Info',
-        content: `Name：${this.data6[index].name}<br>Age：${this.data6[index].age}<br>Address：${this.data6[index].address}`
-      })
-    },
+    ...mapActions(['getFilelist', 'deleteFile', 'uploadFile']),
     remove (index) {
-      this.deleteUser({ id: index }).then(res => {
+      this.deleteFile({ id: index }).then(res => {
         if (res.code === '0') {
           this.$Message.success('删除成功')
           this.currentPage = 1
-          this.getUserlist({
+          this.getFilelist({
             pageNo: 0,
             pageSize: 10
           })
@@ -93,10 +79,15 @@ export default {
     },
     pageChange (page) {
       this.currentPage = page
-      this.getUserlist({
+      this.getFilelist({
         pageNo: page,
         pageSize: 10
       })
+    },
+    upload (name) {
+      if (name) {
+        this.uploadFile(name)
+      }
     }
   }
 }

@@ -66,6 +66,7 @@ class HttpRequest {
   }
   request (options) {
     const instance = axios.create()
+    axios.defaults.timeout = 10 * 1000
     options = Object.assign(this.getInsideConfig(), options)
     this.interceptors(instance, options.url)
     return instance(options)

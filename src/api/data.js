@@ -49,3 +49,10 @@ export const getTreeSelectData = () => {
     method: 'get'
   })
 }
+export const saveMemberData = () => {
+  return axios.request({
+    url: 'xxxxx',
+    data: info,
+    method: 'post'
+  })
+}
